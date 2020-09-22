@@ -14,6 +14,7 @@
 
     <description></description>
     <dependencies>
+        <!-- Flink基础配置 开始 -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-java</artifactId>
@@ -32,6 +33,8 @@
             <version>${flink.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Flink基础配置 开始 -->
+        <!-- 日志配置 开始 -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
@@ -44,6 +47,7 @@
             <version>${logback.version}</version>
             <scope>runtime</scope>
         </dependency>
+        <!-- 日志配置 结束 -->
     </dependencies>
 
 </project>
