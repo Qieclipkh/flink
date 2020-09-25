@@ -6,4 +6,8 @@
 * 输出结果到指定地方
 * 启动执行
 
-# 2.
+# 2.执行配置
+
+[https://ci.apache.org/projects/flink/flink-docs-release-1.11/zh/dev/execution_configuration.html](https://ci.apache.org/projects/flink/flink-docs-release-1.11/zh/dev/execution_configuration.html)
+
+# 3.Iterations
