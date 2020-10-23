@@ -57,7 +57,7 @@
         <dependency>
             <groupId>org.cly</groupId>
             <artifactId>flink-data</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
     </dependencies>

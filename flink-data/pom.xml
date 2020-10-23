@@ -22,7 +22,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                    <finalName>flink-data-${pom.version}</finalName>
+                    <finalName>flink-data-${project.version}</finalName>
                 </configuration>
             </plugin>
         </plugins>
