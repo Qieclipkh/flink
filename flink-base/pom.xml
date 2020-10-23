@@ -14,6 +14,12 @@
 
     <description></description>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-java</artifactId>
+            <version>${flink.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Flink基础配置 开始 -->
         <dependency>
             <groupId>org.apache.flink</groupId>

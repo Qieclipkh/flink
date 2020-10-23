@@ -1,9 +1,12 @@
 package org.cly.base.stream;
 
 import org.apache.flink.api.common.ExecutionConfig;
+import org.apache.flink.api.common.ExecutionMode;
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.utils.MultipleParameterTool;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.IterativeStream;
@@ -50,6 +53,31 @@ public class StreamingJob {
 			避免设置为0，导致严重的性能下降
 		 */
 		env.setBufferTimeout(100l);
+		/**
+		 *
+		 * 默认重启策略在flink-conf.yaml
+		 * 前提是开启检查点
+		 * 设置从重启策略，覆盖集群默认配置
+		 */
+		env.getConfig().setExecutionMode(ExecutionMode.PIPELINED);
+		//启用检查点
+		env.enableCheckpointing(100, CheckpointingMode.EXACTLY_ONCE);
+		env.setRestartStrategy(RestartStrategies.fallBackRestart());
+		env.setRestartStrategy(RestartStrategies.noRestart());
+		env.setRestartStrategy(RestartStrategies.fixedDelayRestart(
+				//重启次数
+				3,
+				//两次重启之间的时间间隔
+				org.apache.flink.api.common.time.Time.seconds(1))
+		);
+		env.setRestartStrategy(RestartStrategies.failureRateRestart(
+				//时间段内的最大失败次数
+				3,
+				//衡量失败次数的时间段
+				org.apache.flink.api.common.time.Time.minutes(5),
+				//两次重启之间的时间间隔
+				org.apache.flink.api.common.time.Time.seconds(10))
+		);
 	}
 
 
