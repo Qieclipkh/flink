@@ -1,6 +1,6 @@
-package org.cly.base;
+package org.cly.data;
 
-public class TestData {
+public class WordData {
     public static final String[] WORDS = new String[]{
             "To be, or not to be,--that is the question:--",
             "Whether 'tis nobler in the mind to suffer",

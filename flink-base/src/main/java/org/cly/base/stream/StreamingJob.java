@@ -13,7 +13,7 @@ import org.apache.flink.streaming.api.datastream.IterativeStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
-import org.cly.base.TestData;
+import org.cly.data.WordData;
 
 public class StreamingJob {
 
@@ -26,7 +26,7 @@ public class StreamingJob {
 		// 1.1 设置执行环境参数
 		setEnvConfg(env);
 		//2. 加载/读取数据
-		DataStreamSource<String> text = env.fromElements(TestData.WORDS);
+		DataStreamSource<String> text = env.fromElements(WordData.WORDS);
 		//3. 转换和处理数据
 		DataStream<Tuple2<String, Integer>> sum = text.flatMap(new Splitter())
 				.keyBy(value -> value.f0)

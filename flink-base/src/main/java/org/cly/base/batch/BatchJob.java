@@ -5,14 +5,14 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
-import org.cly.base.TestData;
+import org.cly.data.WordData;
 
 public class BatchJob {
 	public static void main(String[] args) throws Exception {
 		//1、获取执行坏境
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		//2、加载/读取数据
-		final DataSet<String> source = env.fromElements(TestData.WORDS);
+		final DataSet<String> source = env.fromElements(WordData.WORDS);
 		//3、转换和处理数据
 		final DataSet<Tuple2<String, Integer>> sum = source
 				.flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
