@@ -1,0 +1,37 @@
+version: "2.2"
+services:
+  jobmanager:
+    image: flink:1.11.2-scala_2.11
+    ports:
+      - "8081:8081"
+    #command: standalone-job --job-classname com.cly.StreamingJob [--job-id <job id>] [--fromSavepoint /path/to/savepoint [--allowNonRestoredState]] [job arguments]
+    command: standalone-job --job-classname com.cly.base.stream.StreamingJob --job-id 01234560123456012345601234560123
+    volumes:
+      # 需要将开发的flink作业打包完成
+      - D:\mavennew\repository\org\cly\flink-base\1.0:/opt/flink/usrlib
+#      - type: bind
+#        source: ./jobmanager/conf
+#        target: /opt/flink/conf
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        parallelism.default: 2
+
+  taskmanager:
+    image: flink:1.11.2-scala_2.11
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    scale: 2
+    volumes:
+      - D:\mavennew\repository\org\cly\flink-base\1.0:/opt/flink/usrlib
+#      - type: bind
+#        source: ./jobmanager/conf
+#        target: /opt/flink/conf
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 2
+        parallelism.default: 2

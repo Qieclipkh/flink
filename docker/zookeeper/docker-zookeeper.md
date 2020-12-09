@@ -1,4 +1,4 @@
-# 1.官方地址 
+# 1.参考
 [https://hub.docker.com/_/zookeeper](https://hub.docker.com/_/zookeeper)
 
 [https://github.com/31z4/zookeeper-docker](https://github.com/31z4/zookeeper-docker)
@@ -9,9 +9,6 @@
 docker pull zookeeper
 #镜像详情
 docker inspect zookeeper
-
-docker run -it --rm --link {容器名称}:zookeeper zookeeper zkCli.sh -server zookeeper
-docker run -d -p 9092:9092 --name kafka   -e "KAFKA_ZOOKEEPER_CONNECT=172.16.193.120:2181" -e "KAFKA_ADVERTISED_HOST_NAME=172.16.193.120" --restart always  wurstmeister/kafka
 ```
 # 3.单机
 
@@ -26,16 +23,14 @@ docker exec -it {容器ID} bash
 ```
 ![avatar](images/zookeeper-container.png)
 
-
 完成后外部访问进行验证
+
 # 4.集群
 ## 4.1 使用docker-compose
 ```
 docker-compose -f cluster/stack.yml up -d
 ```
-## 4.2 docker
-
-
+## 4.2 使用docker run
 ```
 # 创建网络,避免IP
 docker network create --driver bridge --subnet=172.18.0.0/16 --gateway=172.18.0.1 zoonet

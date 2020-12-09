@@ -2,12 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.cly</groupId>
+	<groupId>com.cly</groupId>
 	<artifactId>flink</artifactId>
 	<version>1.0</version>
 	<packaging>pom</packaging>
 
-	<name>Flink</name>
+	<name>flink</name>
 
 
 	<properties>
@@ -19,32 +19,32 @@
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<log4j.version>2.12.1</log4j.version>
 		<logback.version>1.2.3</logback.version>
+		<junit.version>4.12</junit.version>
 	</properties>
 
 	<modules>
-		<module>flink-data</module>
+		<module>flink-configure</module>
 		<module>flink-base</module>
-		<module>flink-logback</module>
+		<module>flink-custiom-connector</module>
 		<module>flink-jdbc</module>
 		<module>flink-kafka</module>
 		<module>flink-state</module>
+		<module>flink-time</module>
+		<module>flink-join</module>
 	</modules>
-
-	<repositories>
-		<repository>
-			<id>apache.snapshots</id>
-			<name>Apache Development Snapshot Repository</name>
-			<url>https://repository.apache.org/content/repositories/snapshots/</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
-
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>${junit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.cly</groupId>
+			<artifactId>flink-configure</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>
 

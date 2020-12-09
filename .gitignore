@@ -16,3 +16,9 @@ buildNumber.properties
 .mvn/timing.properties
 .mvn/wrapper/maven-wrapper.jar
 
+/docker/zookeeper/cluster/node1/
+/docker/zookeeper/cluster/node2/
+/docker/zookeeper/cluster/node3/
+/docker/kafka/kafka
+/docker/kafka/zookeeper
+logs/

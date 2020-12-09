@@ -6,9 +6,33 @@
 * 输出结果到指定地方
 * 启动执行
 
-# 2.执行配置
+# 2.启动本地测试环境
+## 2.1 pom引用
+```
+<dependency>
+    <groupId>org.apache.flink</groupId>
+    <artifactId>flink-core</artifactId>
+    <version>${flink.version}</version>
+</dependency>
+<!-- 启动本地web页面，默认端口：8081 -->
+<dependency>
+    <groupId>org.apache.flink</groupId>
+    <artifactId>flink-runtime-web_${scala.binary.version}</artifactId>
+    <version>${flink.version}</version>
+    <!--<scope>test</scope>-->
+</dependency>
+```
 
-[https://ci.apache.org/projects/flink/flink-docs-release-1.11/zh/dev/execution_configuration.html](https://ci.apache.org/projects/flink/flink-docs-release-1.11/zh/dev/execution_configuration.html)
+## 2.2 java
+
+```
+Configuration conf = new Configuration();
+// 默认端口：8081
+conf.setInteger(RestOptions.PORT,8081);
+StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironmentWithWebUI(conf);
+```
+启动完成后直接访问
+[http://localhost:8081/](http://localhost:8081/)
 
 # 3.Iterations
 
