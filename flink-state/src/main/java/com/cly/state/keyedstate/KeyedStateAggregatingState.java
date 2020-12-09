@@ -1,7 +1,9 @@
 package com.cly.state.keyedstate;
 
+import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.AggregatingState;
+import org.apache.flink.api.common.state.AggregatingStateDescriptor;
 import org.apache.flink.api.common.state.ValueState;
 import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
@@ -21,54 +23,66 @@ public class KeyedStateAggregatingState {
         // 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<Tuple2<Long, Long>> dataStreamSource = env.fromElements(
-                new Tuple2<Long, Long>(1L, 3L),
-                new Tuple2<Long, Long>(2L, 1L),
-                new Tuple2<Long, Long>(1L, 4L),
-                new Tuple2<Long, Long>(1L, 5L),
-                new Tuple2<Long, Long>(2L, 4L),
-                new Tuple2<Long, Long>(2L, 3L)
+                Tuple2.of(1L, 3L),
+                Tuple2.of(2L, 1L),
+                Tuple2.of(1L, 4L),
+                Tuple2.of(1L, 5L),
+                Tuple2.of(2L, 4L),
+                Tuple2.of(2L, 3L)
         );
 
-        DataStream result = dataStreamSource.keyBy(new KeySelector<Tuple2<Long, Long>, Long>() {
-            @Override
-            public Long getKey(Tuple2<Long, Long> value) throws Exception {
-                return value.f0;
-            }
-        }).flatMap(new CountAverageWithValueState());
+        DataStream result = dataStreamSource
+                .keyBy(new MyKeySelecter())
+                .flatMap(new CountAverageWithValueState());
         result.print();
-        env.execute("value state ");
+        env.execute("Aggregating State");
 
     }
 
-    public static class CountAverageWithValueState extends RichFlatMapFunction<Tuple2<Long, Long>, Tuple2<Long, Double>> {
-        private transient ValueState<Tuple2<Long, Long>> avgState;
+    public static class CountAverageWithValueState extends RichFlatMapFunction<Tuple2<Long, Long>, String> {
+        private transient AggregatingState<Tuple2<Long, Long>, String> aggregatingState;
+
         @Override
-        public void flatMap(Tuple2<Long, Long> in, Collector<Tuple2<Long, Double>> out) throws Exception {
-            Tuple2<Long, Long> curr = avgState.value();
-            if(curr == null){
-                curr = Tuple2.of(0L,0L);
-            }
-
-            curr.f0 +=1;
-            curr.f1 += in.f1;
-            if(curr.f0 == 3){
-                Double avg = (double)curr.f1 / curr.f0;
-                out.collect(Tuple2.of(in.f0,avg));
-                avgState.clear();
-            }
-            avgState.update(curr);
-
+        public void flatMap(Tuple2<Long, Long> in, Collector<String> out) throws Exception {
+            aggregatingState.add(in);
+            out.collect(aggregatingState.get());
         }
 
         @Override
         public void open(Configuration parameters) throws Exception {
-            ValueStateDescriptor<Tuple2<Long, Long>> descriptor =new ValueStateDescriptor<>(
-                    "average", // the state name
-                    //TypeInformation.of(new TypeHint<Tuple2<Long, Long>>() {})// type information
-                    Types.TUPLE(Types.LONG,Types.LONG)
-                    //Tuple2.of(0L,0L) // default value of the state, if nothing was set
+            AggregatingStateDescriptor<Tuple2<Long, Long>, String, String> descriptor = new AggregatingStateDescriptor<Tuple2<Long, Long>, String, String>(
+                    "add",
+                    new f(),
+                    Types.STRING
+
             );
-            avgState = getRuntimeContext().getState(descriptor);
+            aggregatingState = getRuntimeContext().getAggregatingState(descriptor);
+        }
+    }
+
+    public static class f implements AggregateFunction<Tuple2<Long, Long>, String, String> {
+
+        @Override
+        public String createAccumulator() {
+            return "Contains：";
+        }
+
+        @Override
+        public String add(Tuple2<Long, Long> value, String accumulator) {
+            if ("Contains：".equals(accumulator)) {
+                return accumulator + value.f1;
+            }
+            return accumulator + " and " + value.f1;
+        }
+
+        @Override
+        public String getResult(String accumulator) {
+            return accumulator;
+        }
+
+        @Override
+        public String merge(String a, String b) {
+            return a + " and " + b;
         }
     }
 }

@@ -16,29 +16,26 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
 
 /**
- * 每3个数的平均值
+ * 当接收到的相同 key 的元素个数等于3个，计算这些元素的 value 的平均值。
  */
 public class KeyedStateValueState {
     public static void main(String[] args) throws Exception {
         // 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         DataStreamSource<Tuple2<Long, Long>> dataStreamSource = env.fromElements(
-                new Tuple2<Long, Long>(1L, 3L),
-                new Tuple2<Long, Long>(2L, 1L),
-                new Tuple2<Long, Long>(1L, 4L),
-                new Tuple2<Long, Long>(1L, 5L),
-                new Tuple2<Long, Long>(2L, 4L),
-                new Tuple2<Long, Long>(2L, 3L)
+                Tuple2.of(1L, 3L),
+                Tuple2.of(2L, 1L),
+                Tuple2.of(1L, 4L),
+                Tuple2.of(1L, 5L),
+                Tuple2.of(2L, 4L),
+                Tuple2.of(2L, 3L)
         );
 
-        DataStream result = dataStreamSource.keyBy(new KeySelector<Tuple2<Long, Long>, Long>() {
-            @Override
-            public Long getKey(Tuple2<Long, Long> value) throws Exception {
-                return value.f0;
-            }
-        }).flatMap(new CountAverageWithValueState());
+        DataStream result = dataStreamSource
+                .keyBy(new MyKeySelecter())
+                .flatMap(new CountAverageWithValueState());
         result.print();
-        env.execute("value state ");
+        env.execute("Value State");
 
     }
 
@@ -65,10 +62,12 @@ public class KeyedStateValueState {
         @Override
         public void open(Configuration parameters) throws Exception {
             ValueStateDescriptor<Tuple2<Long, Long>> descriptor =new ValueStateDescriptor<>(
-                    "average", // the state name
-                    //TypeInformation.of(new TypeHint<Tuple2<Long, Long>>() {})// type information
+                    // 状态名称
+                    "average",
+                    //状态的数据类型
                     Types.TUPLE(Types.LONG,Types.LONG)
-                    //Tuple2.of(0L,0L) // default value of the state, if nothing was set
+                    // 状态的默认值
+                    //Tuple2.of(0L,0L)
             );
             avgState = getRuntimeContext().getState(descriptor);
         }
