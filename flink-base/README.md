@@ -1,3 +1,8 @@
+# 总览
+## Flink架构图
+![avatar](../flink-images/processes.svg)
+## Jobmanager 
+![avatar](../flink-images/Flink%20Graph.png)
 # 1.开发FLink程序基本步骤
 
 * 获取执行环境
@@ -5,7 +10,6 @@
 * 转换和处理数据
 * 输出结果到指定地方
 * 启动执行
-
 # 2.启动本地测试环境
 ## 2.1 pom引用
 ```
