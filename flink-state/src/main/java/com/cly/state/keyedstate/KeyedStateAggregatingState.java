@@ -1,13 +1,11 @@
 package com.cly.state.keyedstate;
 
+import com.cly.data.StateKeyedStateData;
 import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.AggregatingState;
 import org.apache.flink.api.common.state.AggregatingStateDescriptor;
-import org.apache.flink.api.common.state.ValueState;
-import org.apache.flink.api.common.state.ValueStateDescriptor;
 import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -22,14 +20,7 @@ public class KeyedStateAggregatingState {
     public static void main(String[] args) throws Exception {
         // 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<Tuple2<Long, Long>> dataStreamSource = env.fromElements(
-                Tuple2.of(1L, 3L),
-                Tuple2.of(2L, 1L),
-                Tuple2.of(1L, 4L),
-                Tuple2.of(1L, 5L),
-                Tuple2.of(2L, 4L),
-                Tuple2.of(2L, 3L)
-        );
+        DataStreamSource<Tuple2<Long, Long>> dataStreamSource = env.fromElements(StateKeyedStateData.DATA);
 
         DataStream result = dataStreamSource
                 .keyBy(new MyKeySelecter())

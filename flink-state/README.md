@@ -122,7 +122,7 @@ Started Queryable State Proxy Server @ /127.0.0.1:9069.
 ## 4.2 查询状态
 
 ### 4.2.1 服务端
-实现参考`com.cly.state.QueryStateServer`
+实现参考`com.cly.state.querystate.QueryStateServer`
 * 通过Queryable State Stream使状态可查
 * 通过StateDescriptor的setQueryable方法使状态可查
 

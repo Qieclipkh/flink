@@ -1,4 +1,4 @@
-package com.cly.state;
+package com.cly.state.querystate;
 
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;

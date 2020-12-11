@@ -37,10 +37,9 @@ public class Consumer {
         props.setProperty("flink.partition-discovery.interval-millis",String.valueOf(10 * 1000));
 
 
-
         FlinkKafkaConsumer<String> flinkKafkaConsumer = new FlinkKafkaConsumer(topicName,valueDeserializer,props);
         //禁用或启用offset提交，这时Properties配置的enable.auto.commit、auto.commit.interval.ms将被忽略
-        flinkKafkaConsumer.setCommitOffsetsOnCheckpoints(Boolean.FALSE);
+        flinkKafkaConsumer.setCommitOffsetsOnCheckpoints(Boolean.TRUE);
         //指定watermark
         flinkKafkaConsumer.assignTimestampsAndWatermarks(WatermarkStrategy.forBoundedOutOfOrderness(Duration.ofSeconds(10)));
         /**

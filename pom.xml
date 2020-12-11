@@ -43,6 +43,12 @@
 			<groupId>com.cly</groupId>
 			<artifactId>flink-configure</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>flink-core</artifactId>
+					<groupId>org.apache.flink</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 	<build>

@@ -1,5 +1,6 @@
 package com.cly.state.keyedstate;
 
+import com.cly.data.StateKeyedStateData;
 import org.apache.commons.compress.utils.Lists;
 import org.apache.flink.api.common.functions.RichFlatMapFunction;
 import org.apache.flink.api.common.state.ListState;
@@ -23,14 +24,7 @@ public class KeyedStateListState {
     public static void main(String[] args) throws Exception {
         // 获取执行环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-        DataStreamSource<Tuple2<Long, Long>> dataStreamSource = env.fromElements(
-                Tuple2.of(1L, 3L),
-                Tuple2.of(2L, 1L),
-                Tuple2.of(1L, 4L),
-                Tuple2.of(1L, 5L),
-                Tuple2.of(2L, 4L),
-                Tuple2.of(2L, 3L)
-        );
+        DataStreamSource<Tuple2<Long, Long>> dataStreamSource = env.fromElements(StateKeyedStateData.DATA);
 
         DataStream result = dataStreamSource
                 .keyBy(new MyKeySelecter())
