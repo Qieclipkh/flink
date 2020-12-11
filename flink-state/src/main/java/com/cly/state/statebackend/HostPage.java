@@ -1,18 +1,15 @@
 package com.cly.state.statebackend;
 
 import com.cly.state.statebackend.bean.ApacheLogEvent;
-import com.cly.state.statebackend.bean.PageViewResult;
-import com.cly.state.statebackend.func.PageCountAgg;
-import com.cly.state.statebackend.func.CountAggWindowResult;
+import com.cly.state.statebackend.func.PageCountAggFunc;
+import com.cly.state.statebackend.func.PageCountAggWindowFunc;
 import com.cly.state.statebackend.func.ToApacheLogEvent;
 import com.cly.state.statebackend.func.TopNProcessFunc;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.util.Collector;
 
 import java.time.Duration;
 
@@ -43,7 +40,7 @@ public class HostPage {
                  *     字符串=》93.114.45.13 - - 17/05/2015:10:05:04 +0000 GET /reset.css
                  *            93.114.45.13 - - 17/05/2015:10:05:45 +0000 GET /style2.css
                  */
-                .readTextFile("clazz:/apache.log")
+                .readTextFile("clazz:/apache2.log")
                 /**
                  * 将读取的字符串数据转换成 ApacheLogEvent 实体对象
                  * 数据输出：同一个TaskSlot
@@ -67,24 +64,23 @@ public class HostPage {
                  * 窗口URL进行统计，得到在一个窗口期间每个URL的访问次数
                  * 数据输出：
                  *      PageCountAgg()//每接收到一条数据，处理一条
-                 *      TaskSlot1 => 1
-                 *      TaskSlot2 => 1
+                 *          TaskSlot1 => 1
+                 *          TaskSlot2 => 1
                  *      CountAggWindowResult()// 在窗口时间结束后，触发运行一次
-                 *      TaskSlot1 => PageViewResult(${窗口开始时间},${窗口结束时间},"/reset.css",1)
-                 *      TaskSlot2 => PageViewResult(${窗口开始时间},${窗口结束时间},"/style2.css",1)
+                 *          TaskSlot1 => PageViewResult(${窗口开始时间},${窗口结束时间},"/reset.css",1)
+                 *          TaskSlot2 => PageViewResult(${窗口开始时间},${窗口结束时间},"/style2.css",1)
                  *
                  *  最后的到每个URL的窗口期间内的访问次数
                  */
-                .aggregate(new PageCountAgg(), new CountAggWindowResult())
+                .aggregate(new PageCountAggFunc(), new PageCountAggWindowFunc())
                 /**
                  * 按照窗口进行分区，具有相同窗口的数据分配到同一个TaskSlot上
                  */
                 .keyBy(value -> value.getWindowTimeEndL())
                 /**
-                 * 对同一个窗口中的数据进行排序输出
+                 * 实现排序逻辑
                  */
                 .process(new TopNProcessFunc(5))
-                // 实现排序逻辑
                 .print()
         ;
         env.execute("Host Page");

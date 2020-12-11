@@ -15,6 +15,11 @@ import java.util.List;
 import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
+/**
+ * Long: key的数据类型（窗口结束时间），前面算子keyBy的指定的key
+ * PageViewResult: 输入数据类型
+ * String: 输出数据类型
+ */
 public class TopNProcessFunc extends KeyedProcessFunction<Long, PageViewResult, String> {
 
     private Integer topSize;

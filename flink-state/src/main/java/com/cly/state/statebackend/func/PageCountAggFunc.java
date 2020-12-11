@@ -5,8 +5,11 @@ import org.apache.flink.api.common.functions.AggregateFunction;
 
 /**
  * 增量聚合函数，每接收一条数据+1
+ * ApacheLogEvent:输入数据类型
+ * Long: 累加器类型
+ * Long: 输出数据类型
  */
-public class PageCountAgg implements AggregateFunction<ApacheLogEvent, Long, Long> {
+public class PageCountAggFunc implements AggregateFunction<ApacheLogEvent, Long, Long> {
     /**
      * 初始化累加器
      * @return
@@ -27,9 +30,15 @@ public class PageCountAgg implements AggregateFunction<ApacheLogEvent, Long, Lon
         return accumulator + 1;
     }
 
+    /**
+     * SessionWindow会调用该方法，TimeWindow不会调用
+     * @param acc1
+     * @param acc2
+     * @return
+     */
     @Override
     public Long merge(Long acc1, Long acc2) {
-        return acc1 + acc2;
+        return null;
     }
 
     /***

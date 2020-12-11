@@ -3,8 +3,8 @@ package com.cly.state.statebackend.bean;
 import java.io.Serializable;
 
 public class PageViewResult implements Serializable {
-    private static final long serialVersionUID = 3508531335788080977L;
 
+    private static final long serialVersionUID = 1L;
 
     private String windowTimeStart;
     private String windowTimeEnd;
@@ -15,7 +15,7 @@ public class PageViewResult implements Serializable {
     public PageViewResult() {
     }
 
-    public PageViewResult(String windowTimeStart, String windowTimeEnd,Long windowTimeEndL, String url, Long count) {
+    public PageViewResult(String windowTimeStart, String windowTimeEnd, Long windowTimeEndL, String url, Long count) {
         this.windowTimeStart = windowTimeStart;
         this.windowTimeEnd = windowTimeEnd;
         this.windowTimeEndL = windowTimeEndL;

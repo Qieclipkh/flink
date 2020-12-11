@@ -7,7 +7,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/**
+ * 将字符串转换成 ApacheLogEvent 实体对象
+ * String: 输入数据类型
+ * ApacheLogEvent：输出数据类型
+ */
 public class ToApacheLogEvent implements MapFunction<String, ApacheLogEvent> {
+    /**
+     *
+     * @param value
+     * @return
+     * @throws Exception
+     */
     @Override
     public ApacheLogEvent map(String value) throws Exception {
         final ApacheLogEvent apacheLogEvent = buildApacheLogEvent(value);

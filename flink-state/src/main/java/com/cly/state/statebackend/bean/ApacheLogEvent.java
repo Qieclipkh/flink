@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class ApacheLogEvent implements Serializable {
 
-    private static final long serialVersionUID = 4073994234291225041L;
+    private static final long serialVersionUID = 1L;
     private String ip;
     private String userId;
     private Long eventTime;
