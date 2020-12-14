@@ -7,6 +7,7 @@ import org.apache.flink.api.common.state.MapState;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.util.Collector;
+import scala.collection.mutable.ListBuffer;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -33,8 +34,22 @@ public class TopNProcessFunc extends KeyedProcessFunction<Long, PageViewResult, 
     private transient MapState<String,Long> pageViewCountMapState;
 
     /**
+     * 初始化状态信息
+     * @param parameters
+     * @throws Exception
+     */
+    @Override
+    public void open(Configuration parameters) throws Exception {
+        ListStateDescriptor<PageViewResult> descriptor = new ListStateDescriptor<PageViewResult>(
+                "url-state-count",
+                PageViewResult.class
+        );
+        pageViewCountListState = getRuntimeContext().getListState(descriptor);
+    }
+
+    /**
      * 每接收一条数据处理一次
-     *
+     * 处理每条流入的数据，
      * @param value
      * @param ctx
      * @param out
@@ -44,24 +59,45 @@ public class TopNProcessFunc extends KeyedProcessFunction<Long, PageViewResult, 
     public void processElement(PageViewResult value, Context ctx, Collector<String> out) throws Exception {
         // 接收一条数据，将数据存储在状态中
         pageViewCountListState.add(value);
-        // 注册 windowEnd+1 的 EventTime 定时器, 当触发时，说明收齐了属于windowEnd窗口的所有商品数据
+        /**
+         * //TODO 为什么要弄个定时器？
+         * 注册 windowEnd+1 的 EventTime 定时器, 当触发时，说明收齐了属于windowEnd窗口的所有商品数据
+         * 每一条数据都会注册，为什么不会重复执行呢？
+         * 由于Flink对（每个key+timestatmp）只维护一个定时器。如果相同的timestamp注册多个Timer,则只调用onTimer方法一次
+         */
         ctx.timerService().registerEventTimeTimer(value.getWindowTimeEndL() + 1);
+        /**
+         * 定义1分钟之后的定时器，用于清楚状态
+         */
+        ctx.timerService().registerEventTimeTimer(value.getWindowTimeEndL()+ 60*1000L);
     }
-
-
+    /**
+     * //TODO TimerService
+     * 1.processing-time/event-time timer都由 TimerService在内部维护并排队等待执行
+     * 2.仅在keyed stream中有效
+     * 3.由于Flink对（每个key+timestatmp）只维护一个定时器。如果相同的timestamp注册多个Timer,则只调用onTimer方法一次
+     * 4.Flink保证同步调用 processElement() 和 onTimer()。因此用户不必担心状态的并发修改
+     */
+    /**
+     * 定时回调方法
+     * @param timestamp
+     * @param ctx
+     * @param out
+     * @throws Exception
+     */
     @Override
     public void onTimer(long timestamp, OnTimerContext ctx, Collector<String> out) throws Exception {
-        /* 作用是什么？
+        // 作用是什么？
         if(timestamp == (ctx.getCurrentKey() + 60 * 1000L)){
-            pageViewCountMapState.clear();
+            pageViewCountListState.clear();
             return;
-        }*/
-
+        }
+        ListBuffer<PageViewResult> s = new ListBuffer<>();
         List<PageViewResult> allItems = new ArrayList<>();
         for (PageViewResult item : pageViewCountListState.get()) {
             allItems.add(item);
         }
-
+        // 清空操作
         pageViewCountListState.clear();
 
         List<PageViewResult> pageViewResults = allItems.stream().sorted(Comparator.comparingLong(new ToLongFunction<PageViewResult>() {
@@ -89,13 +125,5 @@ public class TopNProcessFunc extends KeyedProcessFunction<Long, PageViewResult, 
     }
 
 
-    @Override
-    public void open(Configuration parameters) throws Exception {
-        ListStateDescriptor<PageViewResult> descriptor = new ListStateDescriptor<PageViewResult>(
-                "url-state-count",
-                PageViewResult.class
-        );
-        pageViewCountListState = getRuntimeContext().getListState(descriptor);
-    }
 
 }
